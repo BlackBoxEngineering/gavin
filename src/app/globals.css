@@ -336,6 +336,55 @@ button {
   color: var(--accent-strong);
 }
 
+.contact-intake {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.5rem;
+}
+
+.contact-intake-actions {
+  display: grid;
+  gap: 0.9rem;
+  justify-items: start;
+}
+
+.form-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 11rem;
+  padding: 1rem 1.05rem;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--surface-strong) 82%, transparent);
+  color: var(--text);
+  font: inherit;
+  line-height: 1.7;
+  resize: vertical;
+  outline: none;
+}
+
+.form-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.form-textarea:focus {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+}
+
+.form-note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
 .page-hero {
   padding: clamp(0.8rem, 3vw, 2rem) 0 1rem;
 }

@@ -54,21 +54,29 @@ export default function Contact() {
               Start with a direct message.
             </h2>
             <p className="lede" style={{ marginTop: "1rem" }}>
-              A short outline is enough — the pressure point, the business
+              A short outline is enough: the pressure point, the business
               context, and whether the issue is strategic, financial,
               operational, or reputational.
             </p>
-            <div style={{ marginTop: "1.5rem", display: "grid", gap: "1rem" }}>
-              <a
-                href="mailto:gavin@censinvestments.co.uk"
-                className="button-primary"
-                style={{ display: "inline-flex", width: "fit-content" }}
-              >
-                Email Gavin Woodhouse
-              </a>
-              <p style={{ margin: 0, color: "var(--text-muted)", fontSize: "0.9rem" }}>
-                Cens Investments &mdash; 86&ndash;90 Paul Street, London EC2A 4NE
-              </p>
+            <div className="contact-intake">
+              <label className="form-label" htmlFor="contact-message">
+                Message
+              </label>
+              <textarea
+                id="contact-message"
+                className="form-textarea"
+                rows={7}
+                placeholder="Describe the situation, the business context, and the best way to reply."
+              />
+              <div className="contact-intake-actions">
+                <button type="button" className="button-primary">
+                  Send Message
+                </button>
+                <p className="form-note">
+                  Contact submissions will be handled privately through the
+                  site and routed into the admin dashboard.
+                </p>
+              </div>
             </div>
           </section>
         </div>
@@ -125,3 +133,4 @@ export default function Contact() {
     </div>
   );
 }
+
