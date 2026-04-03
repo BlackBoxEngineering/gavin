@@ -36,6 +36,20 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     locale: "en_GB",
     type: "website",
+    images: [
+      {
+        url: "/photos/gavin-woodhouse-executive-headshot.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Gavin Woodhouse — Business Advisor & Mentor",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME} | Business Advisor & Mentor`,
+    description: "Gavin Woodhouse - strategic business advisor and mentor. Trusted counsel for business owners navigating growth, crisis, and recovery.",
+    images: ["/photos/gavin-woodhouse-executive-headshot.jpg"],
   },
 };
 

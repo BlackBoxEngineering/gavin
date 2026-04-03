@@ -47,6 +47,30 @@ export default function Contact() {
               during a difficult chapter.
             </p>
           </section>
+
+          <section className="section-block">
+            <span className="eyebrow">Get in Touch</span>
+            <h2 className="section-title" style={{ marginTop: "1rem" }}>
+              Start with a direct message.
+            </h2>
+            <p className="lede" style={{ marginTop: "1rem" }}>
+              A short outline is enough — the pressure point, the business
+              context, and whether the issue is strategic, financial,
+              operational, or reputational.
+            </p>
+            <div style={{ marginTop: "1.5rem", display: "grid", gap: "1rem" }}>
+              <a
+                href="mailto:gavin@censinvestments.co.uk"
+                className="button-primary"
+                style={{ display: "inline-flex", width: "fit-content" }}
+              >
+                Email Gavin Woodhouse
+              </a>
+              <p style={{ margin: 0, color: "var(--text-muted)", fontSize: "0.9rem" }}>
+                Cens Investments &mdash; 86&ndash;90 Paul Street, London EC2A 4NE
+              </p>
+            </div>
+          </section>
         </div>
 
         <aside className="about-side">

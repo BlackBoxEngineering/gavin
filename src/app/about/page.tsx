@@ -110,18 +110,16 @@ export default function About() {
                 type="video/mp4"
               />
             </video>
-            <p className="media-caption">
-              A short introduction from Gavin to add voice, tone, and presence
-              before the written story goes deeper.
-            </p>
+
           </section>
 
           <section className="story-card">
-            <h3 style={{ marginBottom: "1rem" }}>What this page should establish</h3>
+            <h3 style={{ marginBottom: "1rem" }}>Work with Gavin</h3>
             <p>
-              Credibility, lived experience, and a clear reason why Gavin&apos;s
-              perspective is commercially useful to business owners facing
-              growth, restructuring, pressure, or recovery.
+              If the background resonates and the challenge is current, the
+              next step is a direct conversation. No obligation, no pitch —
+              just a practical discussion about whether the advisory offer is
+              the right fit.
             </p>
             <div className="button-row" style={{ marginTop: "1.4rem" }}>
               <Link href="/services" className="button-secondary">

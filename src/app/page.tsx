@@ -20,12 +20,38 @@ export const metadata: Metadata = {
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
-  name: SITE_NAME,
+  name: "Gavin Woodhouse",
   url: SITE_URL,
-  sameAs: ["https://www.linkedin.com/in/gavin-woodhouse-514966286/"],
+  email: "gavin@censinvestments.co.uk",
+  image: `${SITE_URL}/photos/gavin-woodhouse-executive-headshot.jpg`,
   jobTitle: "Business Advisor & Mentor",
   description:
     "UK business advisor and mentor with real-world experience in business growth, financial structuring, crisis advisory, and recovery.",
+  sameAs: [
+    "https://www.linkedin.com/in/gavin-woodhouse-514966286/",
+    "https://gwoo.co.uk",
+  ],
+  worksFor: {
+    "@type": "Organization",
+    name: "Cens Investments",
+    url: "https://gavinwoodhouse.com",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "86-90 Paul Street",
+      addressLocality: "London",
+      postalCode: "EC2A 4NE",
+      addressCountry: "GB",
+    },
+  },
+  knowsAbout: [
+    "Business Advisory",
+    "Crisis Management",
+    "Business Restructuring",
+    "Financial Structuring",
+    "Strategic Mentoring",
+    "Business Recovery",
+    "Capital Structure Advisory",
+  ],
 };
 
 export default function Home() {
@@ -152,9 +178,10 @@ export default function Home() {
             <article className="story-card">
               <h3>Knows the cost of pressure</h3>
               <p>
-                The site should not avoid difficulty. It should show that Gavin
-                understands how commercial pressure can become reputational,
-                financial, and deeply personal.
+                Gavin has navigated public scrutiny, reputational exposure, and
+                the kind of commercial and personal pressure that most advisors
+                only read about. That experience is what makes the perspective
+                genuinely useful when the stakes are high.
               </p>
             </article>
             <article className="story-card">
