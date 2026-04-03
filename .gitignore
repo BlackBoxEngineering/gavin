@@ -40,7 +40,17 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# amplify
+amplify_outputs.json
+
 # project
 gavin/
 README_old.md
 .gitignore_old
+
+
+# amplify
+node_modules
+.amplify
+amplify_outputs*
+amplifyconfiguration*
