@@ -571,6 +571,25 @@ button {
   line-height: 1.6;
 }
 
+.footer-legal {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.footer-legal-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  transition: color 0.18s ease;
+}
+
+.footer-legal-link:hover {
+  color: var(--accent);
+}
+
 .footer-link {
   color: var(--accent-strong);
   text-decoration: none;

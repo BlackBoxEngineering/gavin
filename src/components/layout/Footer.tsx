@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="site-footer">
@@ -10,6 +12,11 @@ export default function Footer() {
           </span>
           <span className="footer-copy">
             © {new Date().getFullYear()} Gavin Woodhouse. All rights reserved.
+          </span>
+          <span className="footer-legal">
+            <Link href="/privacy" className="footer-legal-link">Privacy Policy</Link>
+            <span style={{ color: "var(--border)" }}>·</span>
+            <Link href="/terms" className="footer-legal-link">Terms of Use</Link>
           </span>
         </div>
         <a
