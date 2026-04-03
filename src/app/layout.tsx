@@ -1,20 +1,22 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Cormorant_Garamond, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
-const inter = Inter({
-  variable: "--font-inter",
+const plexSans = IBM_Plex_Sans({
+  variable: "--font-plex-sans",
   subsets: ["latin"],
   display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
   display: "swap",
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -23,8 +25,13 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Gavin Woodhouse — strategic business advisor and mentor. Trusted counsel for business owners navigating growth, crisis, and recovery.",
+    "Gavin Woodhouse - strategic business advisor and mentor. Trusted counsel for business owners navigating growth, crisis, and recovery.",
   metadataBase: new URL(SITE_URL),
+  icons: {
+    icon: "/gavin_woodhouse_symbol.png",
+    shortcut: "/gavin_woodhouse_symbol.png",
+    apple: "/gavin_woodhouse_symbol.png",
+  },
   openGraph: {
     siteName: SITE_NAME,
     locale: "en_GB",
@@ -46,10 +53,12 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} ${playfair.variable}`}>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+      <body className={`${plexSans.variable} ${cormorant.variable}`}>
+        <div className="site-shell">
+          <Navbar />
+          <main className="site-main">{children}</main>
+          <Footer />
+        </div>
       </body>
     </html>
   );

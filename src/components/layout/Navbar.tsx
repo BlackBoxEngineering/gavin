@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -15,7 +16,9 @@ export default function Navbar() {
 
   useEffect(() => {
     const stored = localStorage.getItem("theme") as "light" | "dark" | null;
-    if (stored) setTheme(stored);
+    if (stored) {
+      setTheme(stored);
+    }
   }, []);
 
   function toggleTheme() {
@@ -26,56 +29,41 @@ export default function Navbar() {
   }
 
   return (
-    <header style={{ borderBottom: "1px solid var(--border)", backgroundColor: "var(--surface)" }}>
-      <nav
-        style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1.5rem" }}
-        className="flex items-center justify-between h-16"
-      >
-        <Link
-          href="/"
-          style={{
-            fontFamily: "var(--font-playfair)",
-            color: "var(--accent)",
-            fontSize: "1.25rem",
-            fontWeight: 700,
-            textDecoration: "none",
-            letterSpacing: "0.02em",
-          }}
-        >
-          Gavin Woodhouse
+    <header className="site-header">
+      <nav className="nav-shell">
+        <Link href="/" className="brand-link" aria-label="Gavin Woodhouse home">
+          <span className="brand-logo-stack">
+            <Image
+              src="/gavin_woodhouse_logo_light.png"
+              alt="Gavin Woodhouse"
+              width={653}
+              height={314}
+              priority
+              className="brand-logo brand-logo-light"
+            />
+            <Image
+              src="/gavin_woodhouse_logo_dark.png"
+              alt="Gavin Woodhouse"
+              width={653}
+              height={314}
+              priority
+              className="brand-logo brand-logo-dark"
+            />
+          </span>
         </Link>
 
-        <div className="flex items-center gap-8">
-          {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              style={{
-                color: "var(--text-muted)",
-                textDecoration: "none",
-                fontSize: "0.875rem",
-                letterSpacing: "0.05em",
-                textTransform: "uppercase",
-                fontWeight: 500,
-              }}
-            >
-              {l.label}
+        <div className="nav-links">
+          {links.map((link) => (
+            <Link key={link.href} href={link.href} className="nav-link">
+              {link.label}
             </Link>
           ))}
 
           <button
+            type="button"
             onClick={toggleTheme}
             aria-label="Toggle theme"
-            style={{
-              background: "none",
-              border: "1px solid var(--border)",
-              borderRadius: "4px",
-              padding: "0.25rem 0.625rem",
-              cursor: "pointer",
-              color: "var(--text-muted)",
-              fontSize: "0.75rem",
-              letterSpacing: "0.05em",
-            }}
+            className="theme-toggle"
           >
             {theme === "light" ? "Dark" : "Light"}
           </button>
