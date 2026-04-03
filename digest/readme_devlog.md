@@ -1,7 +1,7 @@
 # Dev Log
 
 ## Setup
-- Domain gavinroothouse.com added to Route 53
+- Domain gavinwoodhouse.com added to Route 53
 - Nameservers updated at Name.com
 - Git repo initialised (empty, README only)
 - Local folder conflict resolved (renamed existing "Gavin" directory)

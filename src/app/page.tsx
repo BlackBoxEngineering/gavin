@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Gavin Woodhouse | Business Advisor & Mentor",
+  title: `${SITE_NAME} | Business Advisor & Mentor`,
   description:
     "Gavin Woodhouse — strategic business advisor and mentor to business owners navigating growth, crisis, and recovery.",
-  alternates: { canonical: "https://gavinroothouse.com" },
+  alternates: { canonical: SITE_URL },
   openGraph: {
-    title: "Gavin Woodhouse | Business Advisor & Mentor",
+    title: `${SITE_NAME} | Business Advisor & Mentor`,
     description:
       "Strategic business advisor and mentor. Trusted counsel for business owners navigating growth, crisis, and recovery.",
-    url: "https://gavinroothouse.com",
+    url: SITE_URL,
     type: "website",
   },
 };
@@ -17,8 +18,8 @@ export const metadata: Metadata = {
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
-  name: "Gavin Woodhouse",
-  url: "https://gavinroothouse.com",
+  name: SITE_NAME,
+  url: SITE_URL,
   sameAs: ["https://www.linkedin.com/in/gavin-woodhouse-514966286/"],
   jobTitle: "Business Advisor & Mentor",
   description:

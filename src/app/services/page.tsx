@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Services",
   description:
     "Advisory services from Gavin Woodhouse — financial structuring, crisis advisory, investment, and strategic business mentoring.",
-  alternates: { canonical: "https://gavinroothouse.com/services" },
+  alternates: { canonical: `${SITE_URL}/services` },
   openGraph: {
-    title: "Services | Gavin Woodhouse",
+    title: `Services | ${SITE_NAME}`,
     description:
       "Financial structuring, crisis advisory, investment, and strategic business mentoring.",
-    url: "https://gavinroothouse.com/services",
+    url: `${SITE_URL}/services`,
   },
 };
 

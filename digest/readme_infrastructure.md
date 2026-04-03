@@ -1,7 +1,7 @@
 # AWS Infrastructure
 
 ## Domain
-- **Domain:** gavinroothouse.com
+- **Domain:** gavinwoodhouse.com
 - **Registrar:** Name.com
 - **DNS:** AWS Route 53 (nameservers updated at Name.com — confirmed)
 
@@ -15,4 +15,4 @@
 - [ ] AWS pipeline connected to repo
 - [ ] DNS resolving correctly
 - [ ] SSL certificate issued (ACM)
-- [ ] Site live at gavinroothouse.com
+- [ ] Site live at gavinwoodhouse.com
