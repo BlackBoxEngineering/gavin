@@ -42,8 +42,13 @@
   - Authorised redirect URI: Cognito hosted UI callback URL
   - Scopes: openid, email, profile
 
+## Cognito Groups
+- `gavin-admingroup` — created manually in Cognito console, for admin dashboard access
+
 ## Outstanding Actions
 - [ ] Register app in Google Cloud Console, get client ID + secret
-- [ ] Request SES production access after first deploy
+- [ ] SES production access — confirmed (existing account)
 - [ ] Submit sitemap to Google Search Console
-- [ ] Create Cognito admin user for Gavin
+- [ ] Add Gavin as user in `gavin-admingroup`
+- [ ] Wire contact form to DynamoDB
+- [ ] Build admin dashboard

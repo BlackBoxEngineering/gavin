@@ -1,4 +1,5 @@
 import { defineAuth, secret } from '@aws-amplify/backend';
+import { preSignUpLinkGoogle } from '../functions/pre-sign-up-link-google/resource';
 
 export const auth = defineAuth({
   loginWith: {
@@ -18,6 +19,9 @@ export const auth = defineAuth({
         'http://localhost:3000',
       ],
     },
+  },
+  triggers: {
+    preSignUp: preSignUpLinkGoogle,
   },
   accountRecovery: 'EMAIL_ONLY',
 });

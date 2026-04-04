@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, IBM_Plex_Sans } from "next/font/google";
+import "@aws-amplify/ui-react/styles.css";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import AuthModal from "@/components/auth/AuthModal";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 const plexSans = IBM_Plex_Sans({
@@ -72,6 +74,7 @@ export default function RootLayout({
           <Navbar />
           <main className="site-main">{children}</main>
           <Footer />
+          <AuthModal />
         </div>
       </body>
     </html>
