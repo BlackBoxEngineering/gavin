@@ -5,10 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Hub } from "aws-amplify/utils";
-import { getCurrentUser, signOut } from "aws-amplify/auth";
+import { fetchAuthSession, getCurrentUser, signOut } from "aws-amplify/auth";
 import { useEffect, useState } from "react";
+import { getSessionGroups, hasAdminAccess } from "@/lib/adminAccess";
 
-const links = [
+const baseLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
@@ -141,6 +142,7 @@ export default function Navbar() {
   const [theme, setTheme] = useState<ThemeName>("light");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [authBusy, setAuthBusy] = useState(false);
 
   useEffect(() => {
@@ -158,9 +160,13 @@ export default function Navbar() {
     const syncAuth = async () => {
       try {
         await getCurrentUser();
+        const session = await fetchAuthSession();
+        const groups = getSessionGroups(session);
         setIsAuthenticated(true);
+        setIsAdmin(hasAdminAccess(groups));
       } catch {
         setIsAuthenticated(false);
+        setIsAdmin(false);
       }
     };
 
@@ -203,6 +209,7 @@ export default function Navbar() {
   }
 
   const authLabel = isAuthenticated ? "Logout" : "Login";
+  const links = isAdmin ? [...baseLinks, { href: "/admin", label: "Admin" }] : baseLinks;
 
   return (
     <header className="site-header">

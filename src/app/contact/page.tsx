@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
+import SupportMessagePanel from "@/components/messaging/SupportMessagePanel";
 
 export const metadata: Metadata = {
   title: "Contact | Gavin Woodhouse",
@@ -72,13 +73,11 @@ export default function Contact() {
                 <button type="button" className="button-primary">
                   Send Message
                 </button>
-                <p className="form-note">
-                  Contact submissions will be handled privately through the
-                  site and routed into the admin dashboard.
-                </p>
               </div>
             </div>
           </section>
+
+          <SupportMessagePanel />
         </div>
 
         <aside className="about-side">
