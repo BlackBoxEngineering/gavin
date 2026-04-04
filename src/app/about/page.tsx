@@ -5,7 +5,7 @@ import { SITE_NAME, SITE_URL } from "@/lib/site";
 export const metadata: Metadata = {
   title: "About Gavin Woodhouse",
   description:
-    "About Gavin Woodhouse: business advisor and mentor with experience building a GBP40m business group, leading 450+ staff, and advising on crisis, restructuring, and recovery.",
+    "About Gavin Woodhouse: business advisor and mentor with experience building a £40m business group, leading 450+ staff, and advising on crisis, restructuring, and recovery.",
   alternates: { canonical: `${SITE_URL}/about` },
   openGraph: {
     title: `About Gavin Woodhouse`,
@@ -117,7 +117,7 @@ export default function About() {
             <h3 style={{ marginBottom: "1rem" }}>Work with Gavin</h3>
             <p>
               If the background resonates and the challenge is current, the
-              next step is a direct conversation. No obligation, no pitch —
+              next step is a direct conversation. No obligation, no pitch -
               just a practical discussion about whether the advisory offer is
               the right fit.
             </p>
@@ -135,3 +135,4 @@ export default function About() {
     </div>
   );
 }
+
