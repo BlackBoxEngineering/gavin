@@ -2,6 +2,45 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Who is Gavin Woodhouse?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Gavin Woodhouse is a UK business advisor and mentor with experience building a £40m business group and leading 450+ staff. He now offers crisis advisory, restructuring support, financial structuring, and strategic mentoring to business owners.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What services does Gavin Woodhouse offer?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Gavin Woodhouse offers crisis advisory, restructuring support, financial structuring, and strategic mentoring for business owners and organisations facing pressure, uncertainty, or complex operational challenges.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What is Gavin Woodhouse's background?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Gavin Woodhouse built and led a group of businesses that reached more than £40m in annual turnover and employed over 450 staff across multiple UK locations. He has firsthand experience of business growth, adversity, and recovery.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How can I contact Gavin Woodhouse?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "You can contact Gavin Woodhouse through the contact form at gavinwoodhouse.com/contact to discuss advisory, restructuring support, crisis guidance, or strategic mentoring.",
+      },
+    },
+  ],
+};
+
 export const metadata: Metadata = {
   title: "Services | Gavin Woodhouse",
   description:
@@ -18,6 +57,10 @@ export const metadata: Metadata = {
 export default function Services() {
   return (
     <div className="page-shell page-hero">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <section className="section-block">
         <span className="eyebrow">Services</span>
         <h1 className="section-title" style={{ marginTop: "1rem" }}>

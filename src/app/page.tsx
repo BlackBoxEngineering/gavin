@@ -20,12 +20,16 @@ export const metadata: Metadata = {
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
+  "@id": `${SITE_URL}#person`,
   name: "Gavin Woodhouse",
   url: SITE_URL,
   image: `${SITE_URL}/photos/gavin-woodhouse-executive-headshot.jpg`,
   jobTitle: "Business Advisor & Mentor",
   description:
     "UK business advisor and mentor with real-world experience in business growth, financial structuring, crisis advisory, and recovery.",
+  mainEntityOfPage: {
+    "@id": `${SITE_URL}#profile`,
+  },
   sameAs: [
     "https://www.linkedin.com/in/gavin-woodhouse-514966286/",
     "https://gwoo.co.uk",
@@ -41,12 +45,66 @@ const personSchema = {
   ],
 };
 
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${SITE_URL}#website`,
+  url: SITE_URL,
+  name: "Gavin Woodhouse",
+  description: "Official website of Gavin Woodhouse, UK business advisor and mentor.",
+  publisher: {
+    "@id": `${SITE_URL}#organization`,
+  },
+};
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": `${SITE_URL}#organization`,
+  name: "Gavin Woodhouse",
+  url: SITE_URL,
+  logo: `${SITE_URL}/gavin_woodhouse_symbol.png`,
+  description:
+    "Personal advisory brand and official website publisher for Gavin Woodhouse, UK business advisor and mentor.",
+  founder: {
+    "@id": `${SITE_URL}#person`,
+  },
+  sameAs: [
+    "https://www.linkedin.com/in/gavin-woodhouse-514966286/",
+  ],
+};
+
+const profilePageSchema = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "@id": `${SITE_URL}#profile`,
+  url: SITE_URL,
+  name: "Gavin Woodhouse - Business Advisor & Mentor",
+  description:
+    "Official profile of Gavin Woodhouse, UK business advisor and mentor specialising in crisis advisory, restructuring, and strategic mentoring.",
+  mainEntity: {
+    "@id": `${SITE_URL}#person`,
+  },
+};
+
 export default function Home() {
   return (
     <>
       <script
         type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <script
+        type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageSchema) }}
       />
       <div className="page-shell page-hero">
         <section className="hero-grid">
@@ -259,3 +317,4 @@ export default function Home() {
     </>
   );
 }
+
