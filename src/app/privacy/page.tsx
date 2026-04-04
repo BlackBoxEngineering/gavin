@@ -3,7 +3,8 @@ import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "Privacy policy for gavinwoodhouse.com — how personal data submitted via the contact form is collected, stored, and used.",
+  description:
+    "Privacy policy for gavinwoodhouse.com - how personal data submitted via the contact form is collected, stored, and used.",
   alternates: { canonical: `${SITE_URL}/privacy` },
   robots: { index: true, follow: true },
 };
@@ -21,13 +22,11 @@ export default function Privacy() {
         </p>
 
         <div style={{ marginTop: "2rem", display: "grid", gap: "1.5rem", lineHeight: 1.8, color: "var(--text)" }}>
-
           <div>
             <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>Who we are</h2>
             <p style={{ margin: 0, color: "var(--text-muted)" }}>
-              This website is operated by Gavin Woodhouse, trading via Cens Investments,
-              86–90 Paul Street, London EC2A 4NE, registered in England No. 14065345.
-              Contact: <a href="mailto:gavin@censinvestments.co.uk" style={{ color: "var(--accent)" }}>gavin@censinvestments.co.uk</a>
+              This website is operated by Gavin Woodhouse. Contact is handled directly
+              through the website contact page.
             </p>
           </div>
 
@@ -71,11 +70,11 @@ export default function Privacy() {
             <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>Your rights</h2>
             <p style={{ margin: 0, color: "var(--text-muted)" }}>
               Under UK GDPR you have the right to access, correct, or request deletion of any
-              personal data we hold about you. To exercise any of these rights, email{" "}
-              <a href="mailto:gavin@censinvestments.co.uk" style={{ color: "var(--accent)" }}>
-                gavin@censinvestments.co.uk
-              </a>.
-              We will respond within 30 days.
+              personal data we hold about you. To exercise any of these rights, please use the{" "}
+              <a href="/contact" style={{ color: "var(--accent)" }}>
+                contact page
+              </a>
+              . We will respond within 30 days.
             </p>
           </div>
 
@@ -87,7 +86,6 @@ export default function Privacy() {
               of any changes.
             </p>
           </div>
-
         </div>
       </section>
     </div>

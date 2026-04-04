@@ -22,7 +22,6 @@ const personSchema = {
   "@type": "Person",
   name: "Gavin Woodhouse",
   url: SITE_URL,
-  email: "gavin@censinvestments.co.uk",
   image: `${SITE_URL}/photos/gavin-woodhouse-executive-headshot.jpg`,
   jobTitle: "Business Advisor & Mentor",
   description:
@@ -31,18 +30,6 @@ const personSchema = {
     "https://www.linkedin.com/in/gavin-woodhouse-514966286/",
     "https://gwoo.co.uk",
   ],
-  worksFor: {
-    "@type": "Organization",
-    name: "Cens Investments",
-    url: "https://gavinwoodhouse.com",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: "86-90 Paul Street",
-      addressLocality: "London",
-      postalCode: "EC2A 4NE",
-      addressCountry: "GB",
-    },
-  },
   knowsAbout: [
     "Business Advisory",
     "Crisis Management",
