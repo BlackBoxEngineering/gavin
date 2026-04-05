@@ -3,7 +3,7 @@
 import "@/lib/amplify-client";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Hub } from "aws-amplify/utils";
 import { fetchAuthSession, getCurrentUser, signOut } from "aws-amplify/auth";
 import { useEffect, useState } from "react";
@@ -138,6 +138,7 @@ function ThemeSwitch({
 }
 
 export default function Navbar() {
+  const router = useRouter();
   const pathname = usePathname();
   const [theme, setTheme] = useState<ThemeName>("light");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -202,7 +203,9 @@ export default function Navbar() {
         },
       });
       setIsAuthenticated(false);
+      setIsAdmin(false);
       window.dispatchEvent(new Event("authStateChanged"));
+      router.push("/");
     } finally {
       setAuthBusy(false);
     }

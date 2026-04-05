@@ -4,6 +4,9 @@ import "@/lib/amplify-client";
 import { useEffect, useState } from "react";
 import { Authenticator } from "@aws-amplify/ui-react";
 import { Hub } from "aws-amplify/utils";
+import { fetchAuthSession } from "aws-amplify/auth";
+import { useRouter } from "next/navigation";
+import { getSessionGroups, hasAdminAccess } from "@/lib/adminAccess";
 
 function CloseIcon() {
   return (
@@ -20,6 +23,7 @@ function CloseIcon() {
 }
 
 export default function AuthModal() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -27,10 +31,23 @@ export default function AuthModal() {
 
     window.addEventListener("triggerLogin", openLoginModal);
 
-    const unsubscribe = Hub.listen("auth", ({ payload }) => {
-      if (payload.event === "signedIn" || payload.event === "signedOut") {
+    const unsubscribe = Hub.listen("auth", async ({ payload }) => {
+      if (payload.event === "signedIn") {
         setOpen(false);
         window.dispatchEvent(new Event("authStateChanged"));
+        try {
+          const session = await fetchAuthSession();
+          const groups = getSessionGroups(session);
+          router.push(hasAdminAccess(groups) ? "/admin" : "/");
+        } catch {
+          router.push("/");
+        }
+      }
+
+      if (payload.event === "signedOut") {
+        setOpen(false);
+        window.dispatchEvent(new Event("authStateChanged"));
+        router.push("/");
       }
     });
 
@@ -38,7 +55,7 @@ export default function AuthModal() {
       window.removeEventListener("triggerLogin", openLoginModal);
       unsubscribe();
     };
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     if (!open) return;

@@ -36,6 +36,12 @@ interface SupportMessageRow {
   createdAt?: string;
 }
 
+interface UserProfileRow {
+  id?: string;
+  email?: string;
+  displayName?: string;
+}
+
 const DEFAULT_SENDERS = [
   "support@gavinwoodhouse.com",
   "info@gavinwoodhouse.com",
@@ -106,6 +112,38 @@ export default function AdminPageClient() {
   const selectedMessageUser =
     users.find((user) => getMessageUserId(user) === selectedMessageUserId) || null;
 
+  const deleteEnabled = hasDeleteApiConfigured();
+
+  const normalizeUser = (user: AdminUserData): AdminUserData => {
+    const emailValue =
+      user.Attributes?.email || user.Attributes?.["custom:email"] || user.Username || "";
+    return {
+      ...user,
+      Username: user.Username || emailValue || "unknown-user",
+      Attributes: {
+        ...(user.Attributes || {}),
+        email: emailValue,
+      },
+      UserStatus: user.UserStatus || "CONFIRMED",
+      Enabled: user.Enabled ?? true,
+    };
+  };
+
+  const mergeUsers = (...collections: AdminUserData[][]): AdminUserData[] => {
+    const map = new Map<string, AdminUserData>();
+    for (const list of collections) {
+      for (const raw of list) {
+        const user = normalizeUser(raw);
+        const key = user.Attributes?.sub || user.Username || user.Attributes?.email || "";
+        if (!key) continue;
+        map.set(key, user);
+      }
+    }
+    return Array.from(map.values()).sort((a, b) =>
+      getUserEmail(a).localeCompare(getUserEmail(b), undefined, { sensitivity: "base" })
+    );
+  };
+
   const loadContacts = async () => {
     const contactModel =
       (dataClient as any).models?.Contact || (dataClient as any).models?.ContactSubmission;
@@ -155,10 +193,64 @@ export default function AdminPageClient() {
     setLoadingData(true);
     setStatus("");
     try {
-      let loadedUsers: AdminUserData[] = [];
+      let apiUsers: AdminUserData[] = [];
+      let profileUsers: AdminUserData[] = [];
+      let threadUsers: AdminUserData[] = [];
+
       if (hasUserApiConfigured()) {
-        loadedUsers = await getUserList();
-      } else {
+        try {
+          apiUsers = await getUserList();
+        } catch (error) {
+          setStatus(error instanceof Error ? error.message : "User list API unavailable.");
+        }
+      }
+
+      const userProfileModel = (dataClient as any).models?.UserProfile;
+      if (userProfileModel) {
+        try {
+          const profileResponse = await userProfileModel.list({ authMode: "userPool" });
+          profileUsers = ((profileResponse?.data || []) as UserProfileRow[]).map((row) => ({
+            Username: row.id || row.email || "user-profile",
+            Attributes: {
+              sub: row.id || "",
+              email: row.email || "",
+              nickname: row.displayName || row.email || "",
+              given_name: row.displayName || "",
+            },
+            UserStatus: "CONFIRMED",
+            Enabled: true,
+          }));
+        } catch {
+          // Keep silent; fallback data sources below.
+        }
+      }
+
+      const supportModel = (dataClient as any).models?.SupportMessage;
+      if (supportModel) {
+        try {
+          const supportResponse = await supportModel.list({ authMode: "userPool" });
+          const rows = ((supportResponse?.data || []) as SupportMessageRow[]).filter(
+            (row) => row.fromUserType === "user"
+          );
+          threadUsers = Array.from(new Set(rows.map((row) => row.userId).filter(Boolean))).map(
+            (userId) => ({
+              Username: userId,
+              Attributes: {
+                sub: userId,
+                email: userId,
+                nickname: userId,
+              },
+              UserStatus: "CONFIRMED",
+              Enabled: true,
+            })
+          );
+        } catch {
+          // Keep silent; thread model may be empty/permission-limited.
+        }
+      }
+
+      let loadedUsers = mergeUsers(apiUsers, profileUsers, threadUsers);
+      if (loadedUsers.length === 0) {
         const currentUser = await getCurrentUser();
         const attributes = await fetchUserAttributes();
         loadedUsers = [
@@ -175,7 +267,6 @@ export default function AdminPageClient() {
             Enabled: true,
           },
         ];
-        setStatus("User API not configured. Showing current signed-in admin only.");
       }
 
       setUsers(loadedUsers);
@@ -402,13 +493,6 @@ export default function AdminPageClient() {
     <div className="page-shell page-hero">
       <section className="section-block admin-hero">
         <span className="eyebrow">Admin Workspace</span>
-        <h1 className="section-title" style={{ marginTop: "1rem" }}>
-          Gavin Site Admin Panel
-        </h1>
-        <p className="lede" style={{ marginTop: "1rem" }}>
-          Signed in as {email || "admin user"}. Manage operational tools,
-          communications, and client workflows from a single workspace.
-        </p>
       </section>
 
       <section className="section-block admin-tools-shell">
@@ -447,7 +531,7 @@ export default function AdminPageClient() {
             className={`admin-tab${activeTab === "emails" ? " admin-tab-active" : ""}`}
             onClick={() => setActiveTab("emails")}
           >
-            Emails
+            System Emails
           </button>
           <button
             type="button"
@@ -493,7 +577,7 @@ export default function AdminPageClient() {
 
         {activeTab === "users" ? (
           <div className="admin-tab-panel">
-            <h2 className="section-title" style={{ marginTop: 0 }}>
+            <h2 className="section-title admin-panel-title" style={{ marginTop: 0 }}>
               All Users ({users.length})
             </h2>
             <div className="admin-table-wrap">
@@ -521,16 +605,18 @@ export default function AdminPageClient() {
                           >
                             Message
                           </button>
-                          <button
-                            type="button"
-                            className="button-secondary admin-delete-btn"
-                            onClick={() => {
-                              void handleDeleteUser(user);
-                            }}
-                            title="Delete user"
-                          >
-                            Delete
-                          </button>
+                          {deleteEnabled ? (
+                            <button
+                              type="button"
+                              className="button-secondary admin-delete-btn"
+                              onClick={() => {
+                                void handleDeleteUser(user);
+                              }}
+                              title="Delete user"
+                            >
+                              Delete
+                            </button>
+                          ) : null}
                         </div>
                       </td>
                     </tr>
@@ -538,26 +624,55 @@ export default function AdminPageClient() {
                 </tbody>
               </table>
             </div>
-            {!hasDeleteApiConfigured() ? (
-              <p className="form-note" style={{ marginTop: "0.8rem" }}>
-                Delete action requires `NEXT_PUBLIC_GAVIN_DELETE_USER_API`.
-              </p>
-            ) : null}
+            <div className="admin-user-cards">
+              {users.map((user) => (
+                <article className="story-card admin-user-card" key={`card-${user.Username}`}>
+                  <div className="admin-user-card-head">
+                    <div>
+                      <h3>{getUserName(user)}</h3>
+                      <p className="admin-user-card-email">{getUserEmail(user)}</p>
+                    </div>
+                    <span className="admin-user-status">{user.UserStatus || "CONFIRMED"}</span>
+                  </div>
+                  <div className="admin-user-card-actions">
+                    <button
+                      type="button"
+                      className="button-secondary"
+                      onClick={() => handleMessageUser(user)}
+                    >
+                      Message
+                    </button>
+                    {deleteEnabled ? (
+                      <button
+                        type="button"
+                        className="button-secondary admin-delete-btn"
+                        onClick={() => {
+                          void handleDeleteUser(user);
+                        }}
+                        title="Delete user"
+                      >
+                        Delete
+                      </button>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
         ) : null}
 
         {activeTab === "messages" ? (
           <div className="admin-tab-panel">
-            <h2 className="section-title" style={{ marginTop: 0 }}>
+            <h2 className="section-title admin-panel-title" style={{ marginTop: 0 }}>
               Support Messages
             </h2>
             {!messageModelReady ? (
-              <p className="lede" style={{ marginTop: "1rem" }}>
+              <p className="lede admin-empty-state" style={{ marginTop: "1rem" }}>
                 SupportMessage model is not deployed yet.
               </p>
             ) : (
               <div className="admin-message-grid" style={{ marginTop: "1rem" }}>
-                <div className="story-stack">
+                <div className="story-stack admin-message-list">
                   {users.map((user) => {
                     const messageUserId = getMessageUserId(user);
                     return (
@@ -576,7 +691,7 @@ export default function AdminPageClient() {
                   })}
                 </div>
 
-                <div className="story-card">
+                <div className="story-card admin-thread-panel">
                   <h3 style={{ marginBottom: "0.8rem" }}>
                     {selectedMessageUser ? `Thread: ${getUserName(selectedMessageUser)}` : "Select a user"}
                   </h3>
@@ -585,9 +700,9 @@ export default function AdminPageClient() {
                   ) : threadRows.length === 0 ? (
                     <p className="form-note">No messages yet for this user.</p>
                   ) : (
-                    <div className="story-stack">
+                    <div className="story-stack admin-thread-list">
                       {threadRows.map((row) => (
-                        <article className="story-card" key={row.id}>
+                        <article className="story-card admin-thread-card" key={row.id}>
                           <h3>{row.fromUserType === "admin" ? "Admin" : "User"}</h3>
                           <p style={{ whiteSpace: "pre-wrap" }}>{row.message}</p>
                           <p className="form-note" style={{ marginTop: "0.6rem" }}>
@@ -632,52 +747,57 @@ export default function AdminPageClient() {
 
         {activeTab === "emails" ? (
           <div className="admin-tab-panel">
-            <h2 className="section-title" style={{ marginTop: 0 }}>
-              Send System Email
+            <h2 className="section-title admin-panel-title" style={{ marginTop: 0 }}>
+              System No-Reply Mailer
             </h2>
             <div className="contact-intake" style={{ marginTop: "1rem" }}>
-              <label className="form-label" htmlFor="admin-mail-to">
-                Recipient
-              </label>
-              <input
-                id="admin-mail-to"
-                type="email"
-                className="form-textarea"
-                style={{ minHeight: "3rem" }}
-                placeholder="client@example.com"
-                value={recipientEmail}
-                onChange={(event) => setRecipientEmail(event.target.value)}
-              />
+              <div className="admin-form-grid">
+                <div>
+                  <label className="form-label" htmlFor="admin-mail-to">
+                    Recipient
+                  </label>
+                  <input
+                    id="admin-mail-to"
+                    type="email"
+                    className="form-textarea admin-input"
+                    placeholder="client@example.com"
+                    value={recipientEmail}
+                    onChange={(event) => setRecipientEmail(event.target.value)}
+                  />
+                </div>
 
-              <label className="form-label" htmlFor="admin-mail-from">
-                From
-              </label>
-              <select
-                id="admin-mail-from"
-                className="form-textarea"
-                style={{ minHeight: "3rem" }}
-                value={fromEmail}
-                onChange={(event) => setFromEmail(event.target.value)}
-              >
-                {senders.map((sender) => (
-                  <option key={sender} value={sender}>
-                    {sender}
-                  </option>
-                ))}
-              </select>
+                <div>
+                  <label className="form-label" htmlFor="admin-mail-from">
+                    From
+                  </label>
+                  <select
+                    id="admin-mail-from"
+                    className="form-textarea admin-input"
+                    value={fromEmail}
+                    onChange={(event) => setFromEmail(event.target.value)}
+                  >
+                    {senders.map((sender) => (
+                      <option key={sender} value={sender}>
+                        {sender}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <label className="form-label" htmlFor="admin-mail-subject">
-                Subject
-              </label>
-              <input
-                id="admin-mail-subject"
-                type="text"
-                className="form-textarea"
-                style={{ minHeight: "3rem" }}
-                placeholder="Message from Gavin Woodhouse"
-                value={subject}
-                onChange={(event) => setSubject(event.target.value)}
-              />
+                <div className="admin-form-grid-span">
+                  <label className="form-label" htmlFor="admin-mail-subject">
+                    Subject
+                  </label>
+                  <input
+                    id="admin-mail-subject"
+                    type="text"
+                    className="form-textarea admin-input"
+                    placeholder="Message from Gavin Woodhouse"
+                    value={subject}
+                    onChange={(event) => setSubject(event.target.value)}
+                  />
+                </div>
+              </div>
 
               <label className="form-label" htmlFor="admin-mail-body">
                 Message
@@ -710,24 +830,24 @@ export default function AdminPageClient() {
 
         {activeTab === "contactForms" ? (
           <div className="admin-tab-panel">
-            <h2 className="section-title" style={{ marginTop: 0 }}>
+            <h2 className="section-title admin-panel-title" style={{ marginTop: 0 }}>
               Contact Submissions ({contacts.length})
             </h2>
             {!contactModelReady ? (
-              <p className="lede" style={{ marginTop: "1rem" }}>
+              <p className="lede admin-empty-state" style={{ marginTop: "1rem" }}>
                 Contact model is not deployed yet. Add `Contact` (or `ContactSubmission`) to
                 Amplify Data schema and deploy.
               </p>
             ) : contacts.length === 0 ? (
-              <p className="lede" style={{ marginTop: "1rem" }}>
+              <p className="lede admin-empty-state" style={{ marginTop: "1rem" }}>
                 No contact submissions found.
               </p>
             ) : (
-              <div className="story-stack" style={{ marginTop: "1rem" }}>
+              <div className="story-stack admin-contact-list" style={{ marginTop: "1rem" }}>
                 {contacts.map((row) => (
                   <article className="story-card" key={row.id}>
                     <div className="admin-contact-row">
-                      <div>
+                      <div className="admin-contact-meta">
                         <h3>{row.name || "Unknown"}</h3>
                         <p>{row.email || "No email provided"}</p>
                         <p className="form-note">
