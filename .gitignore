@@ -47,6 +47,8 @@ amplify_outputs.json
 gavin/
 README_old.md
 .gitignore_old
+tests_local/
+**/__pycache__/
 
 
 # amplify

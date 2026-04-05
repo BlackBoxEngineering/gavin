@@ -40,6 +40,7 @@ const schema = a.schema({
       age: a.integer(),
       address: a.string(),
       postcode: a.string(),
+      country: a.string(),
       telephone: a.string(),
       email: a.string(),
       company: a.string(),

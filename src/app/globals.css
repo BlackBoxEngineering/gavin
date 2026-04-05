@@ -1072,6 +1072,80 @@ button {
   overflow-wrap: anywhere;
 }
 
+.admin-client-contacts-shell {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.admin-client-contact-editor h3 {
+  margin: 0;
+}
+
+.admin-client-contact-toolbar {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.admin-client-contact-form-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-client-contact-filters {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1.35fr repeat(5, minmax(130px, 1fr));
+}
+
+.admin-client-contact-table {
+  min-width: 1120px;
+}
+
+.admin-client-contact-cards {
+  display: none;
+  gap: 0.85rem;
+}
+
+.admin-client-contact-card {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.admin-client-contact-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.admin-client-contact-card p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admin-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.admin-pagination-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.admin-pagination-page {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
 .admin-tab {
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-strong) 74%, transparent);
@@ -1271,6 +1345,14 @@ button {
     grid-template-columns: 1fr;
   }
 
+  .admin-client-contact-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-client-contact-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .about-side {
     position: static;
   }
@@ -1322,6 +1404,20 @@ button {
 
   .admin-user-status {
     align-self: flex-start;
+  }
+
+  .admin-client-contact-filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-client-contact-table {
+    display: none;
+  }
+
+  .admin-client-contact-cards {
+    display: grid;
   }
 }
 
