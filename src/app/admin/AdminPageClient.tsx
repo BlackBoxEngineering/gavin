@@ -495,8 +495,18 @@ export default function AdminPageClient() {
       return;
     }
     setClientContactsModelReady(true);
-    const response = await model.list({ authMode: "userPool" });
-    const rows = ((response?.data || []) as ClientContactRow[]).slice().sort((a, b) =>
+    const allRows: ClientContactRow[] = [];
+    let nextToken: string | undefined;
+    do {
+      const response = await model.list({
+        authMode: "userPool",
+        nextToken,
+        limit: 500,
+      });
+      allRows.push(...((response?.data || []) as ClientContactRow[]));
+      nextToken = response?.nextToken || undefined;
+    } while (nextToken);
+    const rows = allRows.slice().sort((a, b) =>
       a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
     );
     setClientContacts(rows);
