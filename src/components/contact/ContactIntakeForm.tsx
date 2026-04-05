@@ -26,6 +26,7 @@ export default function ContactIntakeForm() {
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
+  const [statusTone, setStatusTone] = useState<"info" | "success" | "error">("info");
 
   useEffect(() => {
     const preloadSignedInDetails = async () => {
@@ -59,22 +60,26 @@ export default function ContactIntakeForm() {
     const message = form.message.trim();
 
     if (!name || !email || !message) {
+      setStatusTone("error");
       setStatus("Name, email, and message are required.");
       return;
     }
 
     if (!isValidEmail(email)) {
+      setStatusTone("error");
       setStatus("Please enter a valid email address.");
       return;
     }
 
     setSubmitting(true);
+    setStatusTone("info");
     setStatus("Sending...");
 
     try {
       const contactModel =
         (client as any).models?.Contact || (client as any).models?.ContactSubmission;
       if (!contactModel) {
+        setStatusTone("error");
         setStatus("Contact model is not available yet.");
         return;
       }
@@ -92,9 +97,11 @@ export default function ContactIntakeForm() {
         ...current,
         message: "",
       }));
+      setStatusTone("success");
       setStatus("Message sent. We will review and respond privately.");
     } catch (error) {
       const detail = error instanceof Error ? error.message : "Failed to send message.";
+      setStatusTone("error");
       setStatus(detail);
     } finally {
       setSubmitting(false);
@@ -144,7 +151,11 @@ export default function ContactIntakeForm() {
         <button type="button" className="button-primary" disabled={submitting} onClick={handleSubmit}>
           {submitting ? "Sending..." : "Send Message"}
         </button>
-        {status ? <p className="form-note">{status}</p> : null}
+        {status ? (
+          <p className={`form-feedback form-feedback-${statusTone}`} role="status" aria-live="polite">
+            {status}
+          </p>
+        ) : null}
       </div>
     </div>
   );

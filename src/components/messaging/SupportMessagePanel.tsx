@@ -154,7 +154,7 @@ export default function SupportMessagePanel() {
             ) : (
               rows.map((row) => (
                 <article className="story-card" key={row.id}>
-                  <h3>{row.fromUserType === "admin" ? "Admin" : "You"}</h3>
+                  <h3>{row.fromUserType === "admin" ? "Gavin" : "You"}</h3>
                   <p style={{ whiteSpace: "pre-wrap" }}>{row.message}</p>
                   <p className="form-note" style={{ marginTop: "0.6rem" }}>
                     {row.createdAt ? new Date(row.createdAt).toLocaleString() : ""}
@@ -167,14 +167,14 @@ export default function SupportMessagePanel() {
             <label className="form-label" htmlFor="support-message-user">
               New message
             </label>
-            <textarea
-              id="support-message-user"
-              className="form-textarea"
-              rows={6}
-              placeholder="Write your message to admin..."
-              value={message}
-              onChange={(event) => setMessage(event.target.value)}
-            />
+              <textarea
+                id="support-message-user"
+                className="form-textarea"
+                rows={6}
+                placeholder="Write your message to Gavin..."
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+              />
             <div className="contact-intake-actions">
               <button
                 type="button"
@@ -184,7 +184,7 @@ export default function SupportMessagePanel() {
                   void sendMessage();
                 }}
               >
-                {sending ? "Sending..." : "Send to Admin"}
+                {sending ? "Sending..." : "Send to Gavin"}
               </button>
               {status ? <p className="form-note">{status}</p> : null}
             </div>

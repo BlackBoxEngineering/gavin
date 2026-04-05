@@ -32,6 +32,24 @@ const schema = a.schema({
       allow.authenticated().to(["read"]),
     ]),
 
+  ClientContact: a
+    .model({
+      name: a.string().required(),
+      gender: a.string(),
+      dob: a.string(),
+      age: a.integer(),
+      address: a.string(),
+      postcode: a.string(),
+      telephone: a.string(),
+      email: a.string(),
+      company: a.string(),
+      project: a.string(),
+      from: a.string(), // reference/source of client (business friend, referral, etc.)
+    })
+    .authorization((allow) => [
+      allow.groups([ADMIN_GROUP]).to(["create", "read", "update", "delete"]),
+    ]),
+
   Contact: a
     .model({
       name: a.string().required(),

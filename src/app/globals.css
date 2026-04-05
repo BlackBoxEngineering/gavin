@@ -385,6 +385,40 @@ button {
   line-height: 1.6;
 }
 
+.form-feedback {
+  margin: 0;
+  width: 100%;
+  padding: 0.72rem 0.8rem;
+  border: 1px solid var(--border);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.form-feedback-info {
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface-soft) 74%, transparent);
+}
+
+.form-feedback-success {
+  color: color-mix(in srgb, #1f6e40 78%, var(--text));
+  border-color: color-mix(in srgb, #1f6e40 35%, var(--border));
+  background: color-mix(in srgb, #1f6e40 12%, var(--surface-strong));
+}
+
+[data-theme="dark"] .form-feedback-success {
+  color: #9ad9b0;
+}
+
+.form-feedback-error {
+  color: color-mix(in srgb, #b03a3a 84%, var(--text));
+  border-color: color-mix(in srgb, #b03a3a 44%, var(--border));
+  background: color-mix(in srgb, #b03a3a 12%, var(--surface-strong));
+}
+
+[data-theme="dark"] .form-feedback-error {
+  color: #f4b0b0;
+}
+
 .page-hero {
   padding: clamp(0.8rem, 3vw, 2rem) 0 1rem;
 }
@@ -946,6 +980,72 @@ button {
   word-break: break-word;
 }
 
+.admin-thread-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.admin-mail-log {
+  margin-top: 0.4rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.admin-mail-log-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.admin-mail-log-head h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.admin-mail-log-item {
+  padding: 0.9rem;
+}
+
+.admin-mail-log-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-mail-log-row strong {
+  overflow-wrap: anywhere;
+}
+
+.admin-mail-log-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.8rem;
+  padding: 0.22rem 0.58rem;
+  border: 1px solid var(--border);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-mail-log-badge-success {
+  color: color-mix(in srgb, #1f6e40 82%, var(--text));
+  border-color: color-mix(in srgb, #1f6e40 32%, var(--border));
+  background: color-mix(in srgb, #1f6e40 12%, var(--surface-strong));
+}
+
+.admin-mail-log-badge-error {
+  color: color-mix(in srgb, #b03a3a 86%, var(--text));
+  border-color: color-mix(in srgb, #b03a3a 40%, var(--border));
+  background: color-mix(in srgb, #b03a3a 12%, var(--surface-strong));
+}
+
 .admin-form-grid {
   display: grid;
   gap: 0.9rem;
@@ -1001,6 +1101,78 @@ button {
   color: #181823;
   border-color: color-mix(in srgb, var(--accent) 80%, #000 20%);
   background: linear-gradient(135deg, #e4cb79, var(--accent));
+}
+
+.admin-confirm-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.admin-confirm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(3px);
+}
+
+.admin-confirm-panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 30rem);
+  border: 1px solid var(--border);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-strong) 92%, transparent),
+    color-mix(in srgb, var(--surface-soft) 88%, transparent)
+  );
+  box-shadow: var(--shadow);
+  padding: 1rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.admin-confirm-panel h3 {
+  margin: 0;
+  font-family: var(--font-cormorant), serif;
+  font-size: 1.6rem;
+  line-height: 1.1;
+}
+
+.admin-confirm-panel p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.admin-confirm-danger {
+  color: color-mix(in srgb, #d25555 76%, var(--text));
+  font-weight: 600;
+}
+
+.admin-confirm-input {
+  width: 100%;
+  min-height: 2.8rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-strong) 78%, transparent);
+  color: var(--text);
+  outline: none;
+}
+
+.admin-confirm-input:focus {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+}
+
+.admin-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .site-footer {

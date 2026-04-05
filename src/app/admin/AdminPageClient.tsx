@@ -9,6 +9,11 @@ import { getSessionGroups, hasAdminAccess, REQUIRED_ADMIN_GROUPS } from "@/lib/a
 import { sendAdminMail } from "@/services/adminMailService";
 import { loadAdminMailDraft, saveAdminMailDraft } from "@/services/adminMailDraftStorage";
 import {
+  loadAdminMailLog,
+  saveAdminMailLog,
+  type AdminMailLogEntry,
+} from "@/services/adminMailLogStorage";
+import {
   deleteUser,
   getUserList,
   hasDeleteApiConfigured,
@@ -18,6 +23,10 @@ import {
 
 type GateState = "loading" | "signedOut" | "forbidden" | "ready" | "error";
 type AdminTab = "overview" | "users" | "messages" | "emails" | "contactForms";
+type ConfirmIntent =
+  | { kind: "deleteUser"; user: AdminUserData }
+  | { kind: "deleteContact"; id: string }
+  | { kind: "deleteMessage"; row: SupportMessageRow };
 
 interface ContactSubmission {
   id: string;
@@ -81,6 +90,78 @@ function TrashIcon() {
   );
 }
 
+function ConfirmModal({
+  open,
+  title,
+  message,
+  dangerNote,
+  confirmLabel,
+  requirePhrase,
+  requireLabel,
+  requireValue,
+  onRequireValueChange,
+  busy,
+  onCancel,
+  onConfirm,
+}: {
+  open: boolean;
+  title: string;
+  message: string;
+  dangerNote?: string;
+  confirmLabel: string;
+  requirePhrase?: string;
+  requireLabel?: string;
+  requireValue?: string;
+  onRequireValueChange?: (value: string) => void;
+  busy: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  if (!open) return null;
+  const requiresTypedConfirm = Boolean(requirePhrase);
+  const typedConfirmValid = !requiresTypedConfirm || (requireValue || "").trim() === requirePhrase;
+
+  return (
+    <div className="admin-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="admin-confirm-title">
+      <div className="admin-confirm-backdrop" onClick={busy ? undefined : onCancel} />
+      <div className="admin-confirm-panel">
+        <h3 id="admin-confirm-title">{title}</h3>
+        <p>{message}</p>
+        {dangerNote ? <p className="admin-confirm-danger">{dangerNote}</p> : null}
+        {requiresTypedConfirm ? (
+          <div className="contact-intake" style={{ marginTop: 0 }}>
+            <label className="form-label" htmlFor="admin-confirm-input">
+              {requireLabel || `Type ${requirePhrase} to confirm`}
+            </label>
+            <input
+              id="admin-confirm-input"
+              type="text"
+              className="admin-confirm-input"
+              value={requireValue || ""}
+              onChange={(event) => onRequireValueChange?.(event.target.value)}
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </div>
+        ) : null}
+        <div className="admin-confirm-actions">
+          <button type="button" className="button-secondary" onClick={onCancel} disabled={busy}>
+            No
+          </button>
+          <button
+            type="button"
+            className="button-primary"
+            onClick={onConfirm}
+            disabled={busy || !typedConfirmValid}
+          >
+            {busy ? "Working..." : confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPageClient() {
   const dataClient = useMemo(() => generateClient({ authMode: "userPool" }), []);
   const [state, setState] = useState<GateState>("loading");
@@ -91,6 +172,9 @@ export default function AdminPageClient() {
   const [contacts, setContacts] = useState<ContactSubmission[]>([]);
   const [loadingData, setLoadingData] = useState(false);
   const [status, setStatus] = useState("");
+  const [confirmIntent, setConfirmIntent] = useState<ConfirmIntent | null>(null);
+  const [confirmBusy, setConfirmBusy] = useState(false);
+  const [confirmInput, setConfirmInput] = useState("");
   const [contactModelReady, setContactModelReady] = useState(false);
   const [messageModelReady, setMessageModelReady] = useState(false);
 
@@ -108,6 +192,9 @@ export default function AdminPageClient() {
   const [message, setMessage] = useState(initialDraft.message || "");
   const [sending, setSending] = useState(false);
   const [mailStatus, setMailStatus] = useState("");
+  const [mailStatusTone, setMailStatusTone] = useState<"info" | "success" | "error">("info");
+  const initialMailLog = useMemo(() => loadAdminMailLog(), []);
+  const [mailLog, setMailLog] = useState<AdminMailLogEntry[]>(initialMailLog);
 
   const senders = useMemo(() => {
     const configured = (process.env.NEXT_PUBLIC_GAVIN_FROM_EMAILS || "")
@@ -126,6 +213,10 @@ export default function AdminPageClient() {
   useEffect(() => {
     saveAdminMailDraft({ recipientEmail, fromEmail, subject, message });
   }, [recipientEmail, fromEmail, subject, message]);
+
+  useEffect(() => {
+    saveAdminMailLog(mailLog);
+  }, [mailLog]);
 
   const getUserEmail = (user: AdminUserData): string =>
     user.Attributes?.email || user.Attributes?.["custom:email"] || user.Username;
@@ -281,7 +372,13 @@ export default function AdminPageClient() {
         }
       }
 
-      let loadedUsers = mergeUsers(apiUsers, profileUsers, threadUsers);
+      let loadedUsers = mergeUsers(threadUsers, profileUsers, apiUsers);
+
+      // When Cognito API users are available, treat them as source of truth
+      // so stale thread/profile-only IDs do not create ghost rows.
+      if (userApiConfigured && apiUsers.length > 0) {
+        loadedUsers = mergeUsers(apiUsers);
+      }
 
       if (userApiConfigured) {
         if (apiError) {
@@ -374,8 +471,10 @@ export default function AdminPageClient() {
       setStatus("Delete user API not configured.");
       return;
     }
-    const confirmed = window.confirm(`Delete user "${getUserEmail(user)}"?`);
-    if (!confirmed) return;
+    if (email && getUserEmail(user).toLowerCase() === email.toLowerCase()) {
+      setStatus("You cannot delete the currently signed-in admin user.");
+      return;
+    }
     try {
       await deleteUser(user.Username);
       setUsers((prev) => prev.filter((row) => row.Username !== user.Username));
@@ -386,8 +485,6 @@ export default function AdminPageClient() {
   };
 
   const handleDeleteContact = async (id: string) => {
-    const confirmed = window.confirm("Delete this contact submission?");
-    if (!confirmed) return;
     try {
       const contactModel =
         (dataClient as any).models?.Contact || (dataClient as any).models?.ContactSubmission;
@@ -403,27 +500,89 @@ export default function AdminPageClient() {
     }
   };
 
+  const handleDeleteSupportMessage = async (row: SupportMessageRow) => {
+    try {
+      const supportModel = (dataClient as any).models?.SupportMessage;
+      if (!supportModel) {
+        setThreadStatus("SupportMessage model not configured.");
+        return;
+      }
+      await supportModel.delete({ id: row.id }, { authMode: "userPool" });
+      setThreadRows((prev) => prev.filter((item) => item.id !== row.id));
+      setThreadStatus("Message deleted.");
+    } catch (error) {
+      setThreadStatus(error instanceof Error ? error.message : "Failed to delete message.");
+    }
+  };
+
+  const runConfirmIntent = async () => {
+    if (!confirmIntent) return;
+    setConfirmBusy(true);
+    try {
+      if (confirmIntent.kind === "deleteUser") {
+        await handleDeleteUser(confirmIntent.user);
+      } else if (confirmIntent.kind === "deleteContact") {
+        await handleDeleteContact(confirmIntent.id);
+      } else {
+        await handleDeleteSupportMessage(confirmIntent.row);
+      }
+      setConfirmIntent(null);
+      setConfirmInput("");
+    } finally {
+      setConfirmBusy(false);
+    }
+  };
+
   const handleSendMail = async () => {
     if (sending) return;
     if (!recipientEmail.trim() || !message.trim()) {
+      setMailStatusTone("error");
       setMailStatus("Recipient email and message are required.");
       return;
     }
 
+    const payload = {
+      recipientEmail: recipientEmail.trim(),
+      fromEmail: fromEmail.trim() || undefined,
+      subject: subject.trim() || "Message from Gavin Woodhouse",
+      message: message.trim(),
+    };
+
     try {
       setSending(true);
+      setMailStatusTone("info");
       setMailStatus("Sending email...");
-      await sendAdminMail({
-        recipientEmail: recipientEmail.trim(),
-        fromEmail: fromEmail.trim() || undefined,
-        subject: subject.trim() || "Message from Gavin Woodhouse",
-        message: message.trim(),
-      });
-      setMailStatus("Email sent successfully.");
+      await sendAdminMail(payload);
+      setMailStatusTone("success");
+      setMailStatus(`Email sent to ${payload.recipientEmail}.`);
+      setMailLog((prev) => [
+        {
+          id: `${Date.now()}-ok`,
+          at: new Date().toISOString(),
+          status: "success",
+          recipientEmail: payload.recipientEmail,
+          fromEmail: payload.fromEmail || "",
+          subject: payload.subject,
+        },
+        ...prev,
+      ]);
       setMessage("");
     } catch (error) {
       const detail = error instanceof Error ? error.message : "Failed to send email";
+      setMailStatusTone("error");
       setMailStatus(detail);
+      setMailLog((prev) => [
+        {
+          id: `${Date.now()}-err`,
+          at: new Date().toISOString(),
+          status: "error",
+          recipientEmail: payload.recipientEmail,
+          fromEmail: payload.fromEmail || "",
+          subject: payload.subject,
+          detail,
+        },
+        ...prev,
+      ]);
     } finally {
       setSending(false);
     }
@@ -593,24 +752,40 @@ export default function AdminPageClient() {
             <div className="admin-metrics-grid">
               <article className="story-card">
                 <h3>Users</h3>
+                <p>
+                  Manage client accounts, monitor active access, and keep the user list
+                  accurate for ongoing communication.
+                </p>
                 <p className="admin-metric-value">{users.length}</p>
               </article>
               <article className="story-card">
-                <h3>Contact Submissions</h3>
-                <p className="admin-metric-value">{contacts.length}</p>
-              </article>
-              <article className="story-card">
-                <h3>Support Messaging</h3>
+                <h3>Messages</h3>
+                <p>
+                  Review and reply to private client threads so support conversations stay in
+                  one place and are easy to track.
+                </p>
                 <p className="admin-metric-value">{messageModelReady ? "Ready" : "Missing"}</p>
               </article>
               <article className="story-card">
-                <h3>Email API</h3>
+                <h3>System Emails</h3>
+                <p>
+                  Send controlled platform mailouts from approved addresses and review delivery
+                  outcomes in the mail log.
+                </p>
                 <p className="admin-metric-value">
                   {process.env.NEXT_PUBLIC_GAVIN_MAIL_API ||
                   "https://457iafd5sc.execute-api.us-east-1.amazonaws.com/main/mailout"
                     ? "Ready"
                     : "Missing"}
                 </p>
+              </article>
+              <article className="story-card">
+                <h3>Contact Forms</h3>
+                <p>
+                  Review incoming contact enquiries from the public form, action important
+                  requests, and clear resolved submissions.
+                </p>
+                <p className="admin-metric-value">{contacts.length}</p>
               </article>
             </div>
           </div>
@@ -653,7 +828,8 @@ export default function AdminPageClient() {
                               type="button"
                               className="admin-icon-btn admin-delete-btn"
                               onClick={() => {
-                                void handleDeleteUser(user);
+                                setConfirmInput("");
+                                setConfirmIntent({ kind: "deleteUser", user });
                               }}
                               aria-label={`Delete ${getUserEmail(user)}`}
                               title="Delete user"
@@ -693,7 +869,8 @@ export default function AdminPageClient() {
                         type="button"
                         className="admin-icon-btn admin-delete-btn"
                         onClick={() => {
-                          void handleDeleteUser(user);
+                          setConfirmInput("");
+                          setConfirmIntent({ kind: "deleteUser", user });
                         }}
                         aria-label={`Delete ${getUserEmail(user)}`}
                         title="Delete user"
@@ -711,7 +888,7 @@ export default function AdminPageClient() {
         {activeTab === "messages" ? (
           <div className="admin-tab-panel">
             <h2 className="section-title admin-panel-title" style={{ marginTop: 0 }}>
-              Support Messages
+              Private Messages
             </h2>
             {!messageModelReady ? (
               <p className="lede admin-empty-state" style={{ marginTop: "1rem" }}>
@@ -750,7 +927,21 @@ export default function AdminPageClient() {
                     <div className="story-stack admin-thread-list">
                       {threadRows.map((row) => (
                         <article className="story-card admin-thread-card" key={row.id}>
-                          <h3>{row.fromUserType === "admin" ? "Admin" : "User"}</h3>
+                          <div className="admin-thread-head">
+                            <h3>{row.fromUserType === "admin" ? "Gavin" : "User"}</h3>
+                            <button
+                              type="button"
+                              className="admin-icon-btn admin-delete-btn"
+                              aria-label="Delete message"
+                              title="Delete message"
+                              onClick={() => {
+                                setConfirmInput("");
+                                setConfirmIntent({ kind: "deleteMessage", row });
+                              }}
+                            >
+                              <TrashIcon />
+                            </button>
+                          </div>
                           <p style={{ whiteSpace: "pre-wrap" }}>{row.message}</p>
                           <p className="form-note" style={{ marginTop: "0.6rem" }}>
                             {row.createdAt ? new Date(row.createdAt).toLocaleString() : ""}
@@ -768,7 +959,7 @@ export default function AdminPageClient() {
                       id="admin-support-reply"
                       className="form-textarea"
                       rows={5}
-                      placeholder="Write a reply to this user..."
+                      placeholder="Write a reply as Gavin..."
                       value={threadBody}
                       onChange={(event) => setThreadBody(event.target.value)}
                     />
@@ -869,7 +1060,48 @@ export default function AdminPageClient() {
                 >
                   {sending ? "Sending..." : "Send Email"}
                 </button>
-                {mailStatus ? <p className="form-note">{mailStatus}</p> : null}
+                {mailStatus ? (
+                  <p className={`form-feedback form-feedback-${mailStatusTone}`} role="status" aria-live="polite">
+                    {mailStatus}
+                  </p>
+                ) : null}
+              </div>
+
+              <div className="admin-mail-log">
+                <div className="admin-mail-log-head">
+                  <h3>Mailout Log</h3>
+                  <button
+                    type="button"
+                    className="button-secondary"
+                    onClick={() => setMailLog([])}
+                    disabled={mailLog.length === 0}
+                  >
+                    Clear Log
+                  </button>
+                </div>
+                {mailLog.length === 0 ? (
+                  <p className="form-note">No mailout activity recorded yet.</p>
+                ) : (
+                  <div className="story-stack">
+                    {mailLog.slice(0, 12).map((entry) => (
+                      <article className="story-card admin-mail-log-item" key={entry.id}>
+                        <div className="admin-mail-log-row">
+                          <strong>{entry.recipientEmail}</strong>
+                          <span
+                            className={`admin-mail-log-badge admin-mail-log-badge-${entry.status}`}
+                          >
+                            {entry.status === "success" ? "Sent" : "Failed"}
+                          </span>
+                        </div>
+                        <p>
+                          From: {entry.fromEmail || "Default sender"} | Subject: {entry.subject}
+                        </p>
+                        <p className="form-note">{new Date(entry.at).toLocaleString()}</p>
+                        {entry.detail ? <p className="form-note">{entry.detail}</p> : null}
+                      </article>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -905,7 +1137,8 @@ export default function AdminPageClient() {
                         type="button"
                         className="button-secondary admin-delete-btn"
                         onClick={() => {
-                          void handleDeleteContact(row.id);
+                          setConfirmInput("");
+                          setConfirmIntent({ kind: "deleteContact", id: row.id });
                         }}
                       >
                         Delete
@@ -921,6 +1154,49 @@ export default function AdminPageClient() {
           </div>
         ) : null}
       </section>
+      <ConfirmModal
+        open={Boolean(confirmIntent)}
+        title={
+          confirmIntent?.kind === "deleteUser"
+            ? "Delete user?"
+            : confirmIntent?.kind === "deleteContact"
+              ? "Delete contact submission?"
+              : "Delete private message?"
+        }
+        message={
+          confirmIntent?.kind === "deleteUser"
+            ? `This will permanently remove ${getUserEmail(confirmIntent.user)} from Cognito and revoke access.`
+            : confirmIntent?.kind === "deleteContact"
+              ? "This will permanently remove this contact submission from the dashboard."
+              : "This will permanently remove this message from the private thread."
+        }
+        dangerNote="This action cannot be undone."
+        confirmLabel={
+          confirmIntent?.kind === "deleteUser"
+            ? "Yes, delete user"
+            : confirmIntent?.kind === "deleteContact"
+              ? "Yes, delete"
+              : "Yes, delete message"
+        }
+        requirePhrase={confirmIntent?.kind === "deleteUser" ? "DELETE" : undefined}
+        requireLabel={
+          confirmIntent?.kind === "deleteUser"
+            ? "Type DELETE to confirm user deletion"
+            : undefined
+        }
+        requireValue={confirmInput}
+        onRequireValueChange={setConfirmInput}
+        busy={confirmBusy}
+        onCancel={() => {
+          if (!confirmBusy) {
+            setConfirmIntent(null);
+            setConfirmInput("");
+          }
+        }}
+        onConfirm={() => {
+          void runConfirmIntent();
+        }}
+      />
     </div>
   );
 }
