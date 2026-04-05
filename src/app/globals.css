@@ -691,8 +691,12 @@ button {
 
 .admin-tabs {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.55rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.2rem;
+  scrollbar-width: thin;
 }
 
 .admin-hero {
@@ -713,7 +717,8 @@ button {
 .admin-tab-panel {
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-strong) 82%, transparent);
-  padding: 1rem;
+  padding: clamp(0.75rem, 1.4vw, 1rem);
+  min-width: 0;
 }
 
 .admin-panel-title {
@@ -736,18 +741,20 @@ button {
 .admin-table-wrap {
   margin-top: 1rem;
   overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.2rem;
 }
 
 .admin-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 720px;
+  min-width: 760px;
 }
 
 .admin-table th,
 .admin-table td {
   text-align: left;
-  padding: 0.7rem;
+  padding: 0.62rem 0.72rem;
   border-bottom: 1px solid var(--border);
   vertical-align: top;
 }
@@ -761,6 +768,45 @@ button {
 
 .admin-table td {
   color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.admin-table td:nth-child(2) {
+  word-break: break-word;
+}
+
+.admin-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-strong) 74%, transparent);
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.admin-icon-btn:hover {
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--border));
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.admin-icon-btn .header-icon {
+  width: 1rem;
+  height: 1rem;
 }
 
 .admin-user-cards {
@@ -772,6 +818,15 @@ button {
 .admin-user-card {
   display: grid;
   gap: 1rem;
+  min-width: 0;
+}
+
+.admin-user-card h3,
+.admin-user-card p {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .admin-user-card-head {
@@ -783,6 +838,7 @@ button {
 
 .admin-user-card-email {
   overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .admin-user-status {
@@ -798,6 +854,8 @@ button {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .admin-user-card-actions {
@@ -812,6 +870,10 @@ button {
 
 [data-theme="dark"] .admin-delete-btn {
   color: #e79b9b;
+}
+
+.admin-delete-btn:hover {
+  border-color: color-mix(in srgb, #c74242 52%, var(--border));
 }
 
 .admin-contact-row {
@@ -830,10 +892,12 @@ button {
 
 .admin-message-list {
   align-content: start;
+  min-width: 0;
 }
 
 .admin-user-thread-btn {
   width: 100%;
+  min-width: 0;
   display: grid;
   gap: 0.3rem;
   text-align: left;
@@ -844,9 +908,18 @@ button {
   cursor: pointer;
 }
 
+.admin-user-thread-btn strong,
+.admin-user-thread-btn span {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .admin-user-thread-btn span {
   color: var(--text-muted);
   font-size: 0.88rem;
+  overflow-wrap: anywhere;
 }
 
 .admin-user-thread-btn-active {
@@ -858,10 +931,19 @@ button {
 .admin-thread-list,
 .admin-contact-list {
   gap: 0.9rem;
+  min-width: 0;
 }
 
 .admin-thread-card {
   background: color-mix(in srgb, var(--surface-soft) 32%, var(--surface-strong));
+}
+
+.admin-thread-card h3,
+.admin-thread-card p {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .admin-form-grid {
@@ -901,6 +983,7 @@ button {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
+  flex: 0 0 auto;
   transition:
     color 0.18s ease,
     border-color 0.18s ease,
@@ -1021,7 +1104,7 @@ button {
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 860px) {
   .desktop-nav {
     display: none;
   }
@@ -1037,7 +1120,9 @@ button {
     padding-top: 0.2rem;
     border-top: 1px solid var(--border);
   }
+}
 
+@media (max-width: 760px) {
   .footer-shell {
     grid-template-columns: 1fr;
   }
@@ -1046,28 +1131,10 @@ button {
     border-radius: 0;
   }
 
-  .admin-tabs {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .admin-tab {
-    width: 100%;
     justify-content: center;
-    padding: 0.65rem 0.75rem;
-    min-height: 2.8rem;
-  }
-
-  .admin-tab-panel {
-    padding: 0.9rem;
-  }
-
-  .admin-table-wrap {
-    display: none;
-  }
-
-  .admin-user-cards {
-    display: grid;
+    padding: 0.65rem 0.8rem;
+    min-height: 2.65rem;
   }
 
   .admin-user-card-head,
@@ -1076,7 +1143,6 @@ button {
     align-items: stretch;
   }
 
-  .admin-user-card-actions .button-secondary,
   .admin-contact-row .button-secondary,
   .contact-intake-actions .button-primary {
     width: 100%;
@@ -1087,12 +1153,44 @@ button {
   }
 }
 
-@media (max-width: 520px) {
-  .admin-tabs {
-    grid-template-columns: 1fr;
+@media (max-width: 430px) {
+  .nav-shell {
+    padding-top: 0.45rem;
+    padding-bottom: 0.6rem;
   }
 
-  .admin-user-card-actions {
+  .nav-top-row {
+    gap: 0.55rem;
+    padding-inline: 0.2rem;
+  }
+
+  .brand-logo-stack {
+    width: 150px;
+  }
+
+  .mobile-actions {
+    gap: 0.5rem;
+  }
+
+  .theme-switcher {
+    padding: 0.18rem;
+  }
+
+  .theme-pill {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .header-action-icon {
+    min-width: 2.45rem;
+    width: 2.45rem;
+  }
+
+  .admin-table-wrap {
+    display: none;
+  }
+
+  .admin-user-cards {
     display: grid;
   }
 }

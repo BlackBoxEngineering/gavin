@@ -51,6 +51,36 @@ const DEFAULT_SENDERS = [
   "noreply@gavinwoodhouse.com",
 ];
 
+function MessageIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="header-icon">
+      <path
+        d="M4.75 6.75h14.5A1.25 1.25 0 0 1 20.5 8v8a1.25 1.25 0 0 1-1.25 1.25h-9l-4 3v-3H4.75A1.25 1.25 0 0 1 3.5 16V8a1.25 1.25 0 0 1 1.25-1.25Z"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.75"
+      />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="header-icon">
+      <path
+        d="M5.75 7.25h12.5M9.25 7.25V5.5h5.5v1.75M8.25 9.75v7.25M12 9.75v7.25M15.75 9.75v7.25M7 19.25h10A1.25 1.25 0 0 0 18.25 18V7.25H5.75V18A1.25 1.25 0 0 0 7 19.25Z"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.75"
+      />
+    </svg>
+  );
+}
+
 export default function AdminPageClient() {
   const dataClient = useMemo(() => generateClient({ authMode: "userPool" }), []);
   const [state, setState] = useState<GateState>("loading");
@@ -196,12 +226,14 @@ export default function AdminPageClient() {
       let apiUsers: AdminUserData[] = [];
       let profileUsers: AdminUserData[] = [];
       let threadUsers: AdminUserData[] = [];
+      let apiError: string | null = null;
+      const userApiConfigured = hasUserApiConfigured();
 
-      if (hasUserApiConfigured()) {
+      if (userApiConfigured) {
         try {
           apiUsers = await getUserList();
         } catch (error) {
-          setStatus(error instanceof Error ? error.message : "User list API unavailable.");
+          apiError = error instanceof Error ? error.message : "User list API unavailable.";
         }
       }
 
@@ -250,7 +282,16 @@ export default function AdminPageClient() {
       }
 
       let loadedUsers = mergeUsers(apiUsers, profileUsers, threadUsers);
-      if (loadedUsers.length === 0) {
+
+      if (userApiConfigured) {
+        if (apiError) {
+          setStatus(`User API error: ${apiError}. Showing fallback user sources only.`);
+        } else if (apiUsers.length === 0) {
+          setStatus("User API returned 0 users. Check gavin-getusers logs and USER_POOL_ID.");
+        }
+      }
+
+      if (!userApiConfigured && loadedUsers.length === 0) {
         const currentUser = await getCurrentUser();
         const attributes = await fetchUserAttributes();
         loadedUsers = [
@@ -597,24 +638,27 @@ export default function AdminPageClient() {
                       <td>{getUserEmail(user)}</td>
                       <td>{user.UserStatus || "CONFIRMED"}</td>
                       <td>
-                        <div className="button-row">
+                        <div className="admin-actions-row">
                           <button
                             type="button"
-                            className="button-secondary"
+                            className="admin-icon-btn"
                             onClick={() => handleMessageUser(user)}
+                            aria-label={`Message ${getUserEmail(user)}`}
+                            title="Message user"
                           >
-                            Message
+                            <MessageIcon />
                           </button>
                           {deleteEnabled ? (
                             <button
                               type="button"
-                              className="button-secondary admin-delete-btn"
+                              className="admin-icon-btn admin-delete-btn"
                               onClick={() => {
                                 void handleDeleteUser(user);
                               }}
+                              aria-label={`Delete ${getUserEmail(user)}`}
                               title="Delete user"
                             >
-                              Delete
+                              <TrashIcon />
                             </button>
                           ) : null}
                         </div>
@@ -637,21 +681,24 @@ export default function AdminPageClient() {
                   <div className="admin-user-card-actions">
                     <button
                       type="button"
-                      className="button-secondary"
+                      className="admin-icon-btn"
                       onClick={() => handleMessageUser(user)}
+                      aria-label={`Message ${getUserEmail(user)}`}
+                      title="Message user"
                     >
-                      Message
+                      <MessageIcon />
                     </button>
                     {deleteEnabled ? (
                       <button
                         type="button"
-                        className="button-secondary admin-delete-btn"
+                        className="admin-icon-btn admin-delete-btn"
                         onClick={() => {
                           void handleDeleteUser(user);
                         }}
+                        aria-label={`Delete ${getUserEmail(user)}`}
                         title="Delete user"
                       >
-                        Delete
+                        <TrashIcon />
                       </button>
                     ) : null}
                   </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import SupportMessagePanel from "@/components/messaging/SupportMessagePanel";
+import ContactIntakeForm from "@/components/contact/ContactIntakeForm";
 
 export const metadata: Metadata = {
   title: "Contact | Gavin Woodhouse",
@@ -59,22 +60,7 @@ export default function Contact() {
               context, and whether the issue is strategic, financial,
               operational, or reputational.
             </p>
-            <div className="contact-intake">
-              <label className="form-label" htmlFor="contact-message">
-                Message
-              </label>
-              <textarea
-                id="contact-message"
-                className="form-textarea"
-                rows={7}
-                placeholder="Describe the situation, the business context, and the best way to reply."
-              />
-              <div className="contact-intake-actions">
-                <button type="button" className="button-primary">
-                  Send Message
-                </button>
-              </div>
-            </div>
+            <ContactIntakeForm />
           </section>
 
           <SupportMessagePanel />

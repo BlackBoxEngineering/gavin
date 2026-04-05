@@ -71,7 +71,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${plexSans.variable} ${cormorant.variable}`}>
+      <body
+        className={`${plexSans.variable} ${cormorant.variable}`}
+        suppressHydrationWarning
+      >
         <div className="site-shell">
           <Suspense fallback={null}>
             <ScrollToTop />

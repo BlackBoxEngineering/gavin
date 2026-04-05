@@ -100,10 +100,14 @@ export default function SupportMessagePanel() {
     }
   };
 
+  const requestLogin = () => {
+    window.dispatchEvent(new Event("triggerLogin"));
+  };
+
   if (!isReady) {
     return (
       <section className="section-block">
-        <span className="eyebrow">Support Messages</span>
+        <span className="eyebrow">Private Messages</span>
         <p className="lede" style={{ marginTop: "1rem" }}>
           Loading your message center...
         </p>
@@ -114,19 +118,27 @@ export default function SupportMessagePanel() {
   if (!isSignedIn) {
     return (
       <section className="section-block">
-        <span className="eyebrow">Support Messages</span>
+        <span className="eyebrow">Private Messages</span>
+        <h2 className="section-title" style={{ marginTop: "1rem" }}>
+          Private thread with Gavin
+        </h2>
         <p className="lede" style={{ marginTop: "1rem" }}>
-          Sign in to open a private message thread with admin.
+          You need to sign in to open a private message thread with Gavin.
         </p>
+        <div className="button-row" style={{ marginTop: "1rem" }}>
+          <button type="button" className="button-primary" onClick={requestLogin}>
+            Login to Continue
+          </button>
+        </div>
       </section>
     );
   }
 
   return (
     <section className="section-block">
-      <span className="eyebrow">Support Messages</span>
+      <span className="eyebrow">Private Messages</span>
       <h2 className="section-title" style={{ marginTop: "1rem" }}>
-        Private thread with admin
+        Private thread with Gavin
       </h2>
       {!modelReady ? (
         <p className="lede" style={{ marginTop: "1rem" }}>
