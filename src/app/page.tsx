@@ -255,6 +255,11 @@ export default function Home() {
                 destabilising events, reputational exposure, or serious
                 uncertainty.
               </p>
+              <p style={{ marginTop: "0.85rem" }}>
+                <Link href="/services/crisis-advisory" className="button-secondary">
+                  Crisis Advisory Service Page
+                </Link>
+              </p>
             </article>
             <article className="service-card">
               <span className="service-kicker">02</span>
@@ -263,6 +268,11 @@ export default function Home() {
                 Guidance through restructuring processes that stabilise
                 operations, improve financial performance, and create a
                 sustainable footing.
+              </p>
+              <p style={{ marginTop: "0.85rem" }}>
+                <Link href="/services/restructuring" className="button-secondary">
+                  Restructuring Support Service Page
+                </Link>
               </p>
             </article>
             <article className="service-card">
@@ -273,13 +283,23 @@ export default function Home() {
                 refinancing opportunities, and more disciplined commercial
                 decision-making.
               </p>
+              <p style={{ marginTop: "0.85rem" }}>
+                <Link href="/services/financial-structuring" className="button-secondary">
+                  Financial Structuring Service Page
+                </Link>
+              </p>
             </article>
             <article className="service-card">
               <span className="service-kicker">04</span>
-              <h3>Business Recovery Mentoring</h3>
+              <h3>Strategic Mentoring</h3>
               <p>
                 Direct support for owners who need a steadier, more experienced
                 voice while rebuilding confidence, direction, and control.
+              </p>
+              <p style={{ marginTop: "0.85rem" }}>
+                <Link href="/services/strategic-mentoring" className="button-secondary">
+                  Strategic Mentoring Service Page
+                </Link>
               </p>
             </article>
           </div>

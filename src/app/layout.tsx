@@ -9,6 +9,9 @@ import AuthModal from "@/components/auth/AuthModal";
 import ScrollToTop from "@/components/layout/ScrollToTop";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
+const googleSiteVerification =
+  process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || process.env.GOOGLE_SITE_VERIFICATION;
+
 const plexSans = IBM_Plex_Sans({
   variable: "--font-plex-sans",
   subsets: ["latin"],
@@ -55,6 +58,7 @@ export const metadata: Metadata = {
     description: "Gavin Woodhouse - strategic business advisor and mentor. Trusted counsel for business owners navigating growth, crisis, and recovery.",
     images: ["/photos/gavin-woodhouse-executive-headshot.jpg"],
   },
+  verification: googleSiteVerification ? { google: googleSiteVerification } : undefined,
 };
 
 export default function RootLayout({

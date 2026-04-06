@@ -87,6 +87,11 @@ export default function Services() {
               The aim is to create calmer decision-making when circumstances are
               changing quickly and confidence is under strain.
             </p>
+            <p style={{ marginTop: "1rem" }}>
+              <Link href="/services/crisis-advisory" className="button-secondary">
+                Explore Crisis Advisory
+              </Link>
+            </p>
           </article>
           <article className="service-card">
             <span className="service-kicker">02</span>
@@ -102,6 +107,11 @@ export default function Services() {
               operational redesign, leadership and reporting alignment, and
               financial performance improvement.
             </p>
+            <p style={{ marginTop: "1rem" }}>
+              <Link href="/services/restructuring" className="button-secondary">
+                Explore Restructuring Support
+              </Link>
+            </p>
           </article>
           <article className="service-card">
             <span className="service-kicker">03</span>
@@ -112,6 +122,11 @@ export default function Services() {
               Particularly useful where leaders need clarity around funding,
               leverage, and business resilience.
             </p>
+            <p style={{ marginTop: "1rem" }}>
+              <Link href="/services/financial-structuring" className="button-secondary">
+                Explore Financial Structuring
+              </Link>
+            </p>
           </article>
           <article className="service-card">
             <span className="service-kicker">04</span>
@@ -121,6 +136,11 @@ export default function Services() {
               more experienced voice during inflection points, periods of
               uncertainty, or leadership isolation. The focus is practical
               perspective, not motivational noise.
+            </p>
+            <p style={{ marginTop: "1rem" }}>
+              <Link href="/services/strategic-mentoring" className="button-secondary">
+                Explore Strategic Mentoring
+              </Link>
             </p>
           </article>
         </div>
