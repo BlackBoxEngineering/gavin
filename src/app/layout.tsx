@@ -71,6 +71,11 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(window.location.hostname==='www.gavinwoodhouse.com'){window.location.replace('https://gavinwoodhouse.com'+window.location.pathname+window.location.search+window.location.hash);}}catch(e){}})()`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()`,
           }}
         />

@@ -12,7 +12,8 @@ export function proxy(request: NextRequest) {
 
   if (host === "www.gavinwoodhouse.com") {
     const url = request.nextUrl.clone();
-    url.host = "gavinwoodhouse.com";
+    url.hostname = "gavinwoodhouse.com";
+    url.port = "";
     url.protocol = "https";
     return NextResponse.redirect(url, 301);
   }
